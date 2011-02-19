@@ -36,8 +36,7 @@ def completion(data, completion_item, buffer, completion):
     infolist = w.infolist_get('buffer_lines', buffer, '');
     while w.infolist_next(infolist):
         list.append(stripcolor(w.infolist_string(infolist, 'message')))
-    text = ' '.join(list)
-    text = text.split(' ')
+    text = (' '.join(list)).split(' ')
 
     pos = w.buffer_get_integer(buffer, 'input_pos')
     input = w.buffer_get_string(buffer, 'input')
