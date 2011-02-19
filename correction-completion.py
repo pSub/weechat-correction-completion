@@ -44,7 +44,7 @@ def completion(data, completion_item, buffer, completion):
     if pos > 0 and ("s/" in input):
         n = input.rfind("s/", 0, pos)
         substr = input[n+2:pos]
-        replace = find((lambda word : word.startswith(substr)), text, buffer)
+        replace = find((lambda word : word.startswith(substr)), text)
         if replace == "":
           replace = substr
         n = len(substr)
@@ -56,7 +56,7 @@ def completion(data, completion_item, buffer, completion):
 def stripcolor(string):
     return w.string_remove_color(string, '')
 
-def find(p, list, buffer):
+def find(p, list):
     for item in list:
       if p(item):
         return item
