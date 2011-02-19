@@ -36,17 +36,20 @@ def completion(data, completion_item, buffer, completion):
     infolist = w.infolist_get('buffer_lines', buffer, '');
     while w.infolist_next(infolist):
         list.append(stripcolor(w.infolist_string(infolist, 'message')))
-    text = (' '.join(list)).split(' ')
+    text = sorted((' '.join(list)).split(' '), key=str.lower)
 
+    i = iter(text)
     pos = w.buffer_get_integer(buffer, 'input_pos')
     input = w.buffer_get_string(buffer, 'input')
 
     if pos > 0 and ("s/" in input):
         n = input.rfind("s/", 0, pos)
         substr = input[n+2:pos]
-        replace = find((lambda word : word.startswith(substr)), text)
+        replace = find((lambda word : word.startswith(substr)), i)
         if replace == "":
           replace = substr
+        if replace == substr:
+          replace = next(i)  
         n = len(substr)
         input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
         w.buffer_set(buffer, 'input', input)
@@ -56,11 +59,14 @@ def completion(data, completion_item, buffer, completion):
 def stripcolor(string):
     return w.string_remove_color(string, '')
 
-def find(p, list):
-    for item in list:
-      if p(item):
-        return item
-    return ""
+def find(p, i):
+    while True:
+      try:
+        item = next(i)
+        if p(item):
+          return item
+      except StopIteration:
+        return ""
 
 if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
     template = 'correction_completion'
