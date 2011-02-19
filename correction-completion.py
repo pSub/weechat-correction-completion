@@ -24,11 +24,11 @@ except ImportError:
     print "Get WeeChat now at: http://www.weechat.org/"
     import_ok = False
 
-SCRIPT_NAME    = "correction-completion"
+SCRIPT_NAME    = "correction_completion"
 SCRIPT_AUTHOR  = "Pascal Wittmann <mail@pascal-wittmann.de>"
 SCRIPT_VERSION = "0.1"
 SCRIPT_LICENSE = "GPL3"
-SCRIPT_DESC    = "Provides a completion for s/typo/correct"
+SCRIPT_DESC    = "Provides a completion for 's/typo/correct'"
 SCRIPT_COMMAND = "correction-completion"
 
 def completion(data, completion_item, buffer, completion):
@@ -73,6 +73,12 @@ if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT
     w.hook_completion(template, "Completes after 's/' with words from buffer",
             'completion', '')
     w.hook_command(SCRIPT_COMMAND, SCRIPT_DESC, "",
-                    """Setup: Add the template %%(%(completion)s) to the default completion template"""
-                    %dict(completion=template),
-                    '', '', '')
+"""Usage:
+If you want to correct yourself, you often do this using the
+expression 's/typo/correct'. This plugin allows you to complete the
+first part (the typo) by pressing <Tab>. The words from the actual
+buffer are used to complet this part.
+
+Setup:
+Add the template %%(%(completion)s) to the default completion template"""
+%dict(completion=template), '', '', '')
