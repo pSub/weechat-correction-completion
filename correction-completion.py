@@ -32,32 +32,49 @@ SCRIPT_DESC    = "Provides a completion for 's/typo/correct'"
 SCRIPT_COMMAND = "correction-completion"
 
 def completion(data, completion_item, buffer, completion):
+    # Get the text of the current buffer
     list = []
     infolist = w.infolist_get('buffer_lines', buffer, '');
     while w.infolist_next(infolist):
         list.append(stripcolor(w.infolist_string(infolist, 'message')))
+
     # Generate a list of words
     text = (' '.join(list)).split(' ')
+
     # Remove duplicate elements
-    text = unify(text) 
+    text = unify(text)
+
     # Sort by alphabet and lenght
     text.sort(key=lambda item: (item, -len(item)))
-
+    
     i = iter(text)
+    
+    # Current cursor position
     pos = w.buffer_get_integer(buffer, 'input_pos')
+
+    # Current input string
     input = w.buffer_get_string(buffer, 'input')
 
     if pos > 2 and input.find("s/") < pos:
+        # Get index of last occurence of "s/" befor cursor position
         n = input.rfind("s/", 0, pos)
+
+        # Get substring and search the replacement
         substr = input[n+2:pos]
         replace = search((lambda word : word.startswith(substr)), i)
+        
+        # If no replacement found, display substring
         if replace == "":
           replace = substr
+        
+        # If substring perfectly matched take next replacement
         if replace == substr:
           try:
             replace = next(i)
           except StopIteration:
             pass
+
+        # Put the replacement into the input
         n = len(substr)
         input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
         w.buffer_set(buffer, 'input', input)
