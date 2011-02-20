@@ -32,6 +32,16 @@ SCRIPT_DESC    = "Provides a completion for 's/typo/correct'"
 SCRIPT_COMMAND = "correction-completion"
 
 def completion(data, completion_item, buffer, completion):
+    # Current cursor position
+    pos = w.buffer_get_integer(buffer, 'input_pos')
+
+    # Current input string
+    input = w.buffer_get_string(buffer, 'input')
+
+    # Check for correct cursor position for completion
+    if not(pos > 2 and input.find("s/") < pos):
+        return WEECHAT_RC_OK
+
     # Get the text of the current buffer
     list = []
     infolist = w.infolist_get('buffer_lines', buffer, '');
@@ -49,36 +59,29 @@ def completion(data, completion_item, buffer, completion):
     
     i = iter(text)
     
-    # Current cursor position
-    pos = w.buffer_get_integer(buffer, 'input_pos')
+    # Get index of last occurence of "s/" befor cursor position
+    n = input.rfind("s/", 0, pos)
 
-    # Current input string
-    input = w.buffer_get_string(buffer, 'input')
+    # Get substring and search the replacement
+    substr = input[n+2:pos]
+    replace = search((lambda word : word.startswith(substr)), i)
+    
+    # If no replacement found, display substring
+    if replace == "":
+      replace = substr
+    
+    # If substring perfectly matched take next replacement
+    if replace == substr:
+      try:
+        replace = next(i)
+      except StopIteration:
+        pass
 
-    if pos > 2 and input.find("s/") < pos:
-        # Get index of last occurence of "s/" befor cursor position
-        n = input.rfind("s/", 0, pos)
-
-        # Get substring and search the replacement
-        substr = input[n+2:pos]
-        replace = search((lambda word : word.startswith(substr)), i)
-        
-        # If no replacement found, display substring
-        if replace == "":
-          replace = substr
-        
-        # If substring perfectly matched take next replacement
-        if replace == substr:
-          try:
-            replace = next(i)
-          except StopIteration:
-            pass
-
-        # Put the replacement into the input
-        n = len(substr)
-        input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
-        w.buffer_set(buffer, 'input', input)
-        w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
+    # Put the replacement into the input
+    n = len(substr)
+    input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
+    w.buffer_set(buffer, 'input', input)
+    w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
     return WEECHAT_RC_OK
 
 def stripcolor(string):
