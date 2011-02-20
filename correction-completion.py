@@ -47,7 +47,7 @@ def completion(data, completion_item, buffer, completion):
     pos = w.buffer_get_integer(buffer, 'input_pos')
     input = w.buffer_get_string(buffer, 'input')
 
-    if pos > 0 and ("s/" in input):
+    if pos > 2 and input.find("s/") < pos:
         n = input.rfind("s/", 0, pos)
         substr = input[n+2:pos]
         replace = find((lambda word : word.startswith(substr)), i)
