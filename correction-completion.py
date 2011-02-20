@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
+import locale
+
 try:
     import weechat as w
     WEECHAT_RC_OK = w.WEECHAT_RC_OK
@@ -33,10 +35,16 @@ SCRIPT_COMMAND = "correction-completion"
 
 def completion(data, completion_item, buffer, completion):
     list = []
+    locale.setlocale(locale.LC_ALL, "")
     infolist = w.infolist_get('buffer_lines', buffer, '');
     while w.infolist_next(infolist):
         list.append(stripcolor(w.infolist_string(infolist, 'message')))
-    text = sorted((' '.join(list)).split(' '), key=str.lower)
+    # Generate a list of words
+    text = (' '.join(list)).split(' ')
+    # Remove duplicate elements
+    text = unify(text) 
+    # Sort by alphabet and lenght
+    text.sort(key=lambda item: (item, -len(item)))
 
     i = iter(text)
     pos = w.buffer_get_integer(buffer, 'input_pos')
@@ -49,7 +57,10 @@ def completion(data, completion_item, buffer, completion):
         if replace == "":
           replace = substr
         if replace == substr:
-          replace = next(i)  
+          try:
+            replace = next(i)
+          except StopIteration:
+            pass
         n = len(substr)
         input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
         w.buffer_set(buffer, 'input', input)
@@ -67,6 +78,13 @@ def find(p, i):
           return item
       except StopIteration:
         return ""
+
+def unify(list):
+    checked = []
+    for e in list:
+      if e not in checked:
+        checked.append(e)
+    return checked
 
 if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
     template = 'correction_completion'
