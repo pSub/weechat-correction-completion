@@ -15,8 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ########################################################################
 
-import locale
-
 try:
     import weechat as w
     WEECHAT_RC_OK = w.WEECHAT_RC_OK
@@ -35,7 +33,6 @@ SCRIPT_COMMAND = "correction-completion"
 
 def completion(data, completion_item, buffer, completion):
     list = []
-    locale.setlocale(locale.LC_ALL, "")
     infolist = w.infolist_get('buffer_lines', buffer, '');
     while w.infolist_next(infolist):
         list.append(stripcolor(w.infolist_string(infolist, 'message')))
