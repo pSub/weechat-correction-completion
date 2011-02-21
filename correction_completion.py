@@ -18,11 +18,9 @@
 try:
     import weechat as w
     WEECHAT_RC_OK = w.WEECHAT_RC_OK
-    import_ok = True
 except ImportError:
     print "This script must be run under WeeChat."
     print "Get WeeChat now at: http://www.weechat.org/"
-    import_ok = False
 
 SCRIPT_NAME    = "correction_completion"
 SCRIPT_AUTHOR  = "Pascal Wittmann <mail@pascal-wittmann.de>"
