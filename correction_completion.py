@@ -29,7 +29,7 @@ SCRIPT_AUTHOR  = "Pascal Wittmann <mail@pascal-wittmann.de>"
 SCRIPT_VERSION = "0.1"
 SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC    = "Provides a completion for 's/typo/correct'"
-SCRIPT_COMMAND = "correction-completion"
+SCRIPT_COMMAND = "correction_completion"
 
 def completion(data, completion_item, buffer, completion):
     # Current cursor position
