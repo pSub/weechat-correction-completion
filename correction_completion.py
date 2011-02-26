@@ -29,6 +29,11 @@ SCRIPT_LICENSE = "GPL3"
 SCRIPT_DESC    = "Provides a completion for 's/typo/correct'"
 SCRIPT_COMMAND = "correction_completion"
 
+# Default Options
+settings = {
+        'languages' : 'en',
+}
+
 def completion(data, completion_item, buffer, completion):
     # Current cursor position
     pos = w.buffer_get_integer(buffer, 'input_pos')
@@ -102,6 +107,11 @@ def unify(list):
     return checked
 
 if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
+    # Set default options if option not set
+    for option, default in settings.iteritem():
+        if not w.config_is_set_plugin(option):
+          w.config_set_plugin(option, default)
+
     template = 'correction_completion'
     w.hook_completion(template, "Completes after 's/' with words from buffer",
             'completion', '')
