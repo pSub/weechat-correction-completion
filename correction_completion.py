@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ######################################################################
 # Copyright (c) 2011 by Pascal Wittmann <mail@pascal-wittmann.de>
 #
@@ -49,9 +50,12 @@ def completion(data, completion_item, buffer, completion):
     input = w.buffer_get_string(buffer, 'input')
 
     # Check for correct cursor position for completion
-    if not(pos > 2 and input.find("s/") < pos):
+    if pos > 2 and input.find("s/") < pos:
+        complete_typo(pos, input, buffer)
         return WEECHAT_RC_OK
+    return WEECHAT_RC_OK
 
+def complete_typo(pos, input, buffer):
     # Get the text of the current buffer
     list = []
     infolist = w.infolist_get('buffer_lines', buffer, '');
@@ -92,7 +96,6 @@ def completion(data, completion_item, buffer, completion):
     input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
     w.buffer_set(buffer, 'input', input)
     w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
-    return WEECHAT_RC_OK
 
 def stripcolor(string):
     return w.string_remove_color(string, '')
