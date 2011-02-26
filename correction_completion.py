@@ -13,7 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Marked Parts are from Wojciech Muła <wojciech_mula@poczta.onet.pl>
+# and are licensed under BSD and are avaliable at
+# http://0x80.pl/proj/aspell-python/
 ########################################################################
+
+import ctypes
+import ctypes.util
 
 try:
     import weechat as w
@@ -31,7 +38,7 @@ SCRIPT_COMMAND = "correction_completion"
 
 # Default Options
 settings = {
-        'languages' : 'en',
+        'lang' : 'en',
 }
 
 def completion(data, completion_item, buffer, completion):
@@ -106,11 +113,48 @@ def unify(list):
         checked.append(e)
     return checked
 
+# Parts are from Wojciech Muła
+def suggest(word):
+    if type(word) is str:
+      suggestions = aspell.aspell_speller_suggest(
+                      speller,
+                      word.encode(),
+                      len(word))
+      elements = aspell.aspell_word_list_elements(suggestions)
+      list = []
+      while True:
+          wordptr = aspell.aspell_string_enumeration_next(elements)
+          if not wordptr:
+              break;
+          else:
+              word = ctypes.c_char_p(wordptr)
+              list.append(str(word.value))
+      aspell.delete_aspell_string_enumeration(elements)
+      return list
+    else:
+      raise TypeError("String expected")
+
 if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
-    # Set default options if option not set
-    for option, default in settings.iteritem():
+    aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
+    config = aspell.new_aspell_config()
+
+    for option, default in settings.iteritems():
         if not w.config_is_set_plugin(option):
           w.config_set_plugin(option, default)
+        value = w.config_get_plugin(option)
+        if not aspell.aspell_config_replace(
+                        config, 
+                        option.encode(), 
+                        value.encode()):
+          raise Exception("Failed to replace config entry")
+
+    # Error checking is from Wojciech Muła
+    possible_error = aspell.new_aspell_speller(config)
+    aspell.delete_aspell_config(config)
+    if aspell.aspell_error_number(possible_error) != 0:
+      aspell.delete_aspell_can_have_error(possible_error)
+      raise Exception("Couldn't create speller")
+    speller = aspell.to_aspell_speller(possible_error)
 
     template = 'correction_completion'
     w.hook_completion(template, "Completes after 's/' with words from buffer",
