@@ -48,11 +48,15 @@ def completion(data, completion_item, buffer, completion):
 
     # Current input string
     input = w.buffer_get_string(buffer, 'input')
+    
+    fst = input.find("s/")
+    snd = input.find("/", fst + 2)
 
-    # Check for correct cursor position for completion
-    if pos > 2 and input.find("s/") < pos:
-        complete_typo(pos, input, buffer)
-        return WEECHAT_RC_OK
+    if pos > 2 and fst >= 0 and fst < pos:
+        if snd >= 0 and snd < pos:
+          complete_replacement(pos, input, buffer)
+        else:
+          complete_typo(pos, input, buffer)
     return WEECHAT_RC_OK
 
 def complete_typo(pos, input, buffer):
@@ -96,6 +100,13 @@ def complete_typo(pos, input, buffer):
     input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
     w.buffer_set(buffer, 'input', input)
     w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
+
+def complete_replacement(pos, input, buffer):
+    n = input.rfind("s/", 0, pos)
+    m = input.rfind("/", n + 2, pos)
+    
+    typo = input[n + 2 : m]
+    repl = input[m + 1 : pos]
 
 def stripcolor(string):
     return w.string_remove_color(string, '')
