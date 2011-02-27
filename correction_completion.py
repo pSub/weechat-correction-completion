@@ -60,6 +60,9 @@ def completion(data, completion_item, buffer, completion):
     return WEECHAT_RC_OK
 
 def complete_typo(pos, input, buffer):
+    global curRepl
+    curRepl = -1
+
     # Get the text of the current buffer
     list = []
     infolist = w.infolist_get('buffer_lines', buffer, '');
@@ -102,11 +105,27 @@ def complete_typo(pos, input, buffer):
     w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
 
 def complete_replacement(pos, input, buffer):
+    global curRepl, suggestions
     n = input.rfind("s/", 0, pos)
     m = input.rfind("/", n + 2, pos)
     
-    typo = input[n + 2 : m]
     repl = input[m + 1 : pos]
+    
+    if curRepl == -1:
+      typo = input[n + 2 : m]
+      suggestions = suggest(typo)
+
+    if curRepl == len(suggestions) - 1:
+      curRepl = -1
+
+    curRepl += 1
+
+    # Put the replacement into the input
+    n = len(repl)
+    input = '%s%s%s' %(input[:pos-n], suggestions[curRepl], input[pos:])
+    w.buffer_set(buffer, 'input', input)
+    w.buffer_set(buffer, 'input_pos', str(pos - n + len(suggestions[curRepl])))
+
 
 def stripcolor(string):
     return w.string_remove_color(string, '')
@@ -149,6 +168,8 @@ def suggest(word):
       raise TypeError("String expected")
 
 if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
+    curRepl = -1
+    suggestions = []
     aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
     config = aspell.new_aspell_config()
 
