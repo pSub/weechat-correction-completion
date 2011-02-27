@@ -171,11 +171,8 @@ def suggest(word):
     else:
       raise TypeError("String expected")
 
-if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
-    curTypo = ''
-    curRepl = -1
-    suggestions = []
-    aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
+def load_config(data = "", option = "", value = ""):
+    global speller
     config = aspell.new_aspell_config()
 
     for option, default in settings.iteritems():
@@ -195,10 +192,21 @@ if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT
       aspell.delete_aspell_can_have_error(possible_error)
       raise Exception("Couldn't create speller")
     speller = aspell.to_aspell_speller(possible_error)
+    return w.WEECHAT_RC_OK
+
+if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
+    curTypo = ''
+    curRepl = -1
+    suggestions = []
+    aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
+    speller = 0
+    
+    load_config()
 
     template = 'correction_completion'
     w.hook_completion(template, "Completes after 's/' with words from buffer",
             'completion', '')
+    w.hook_config("plugins.var.python." + SCRIPT_NAME + ".*", "load_config", "")
     w.hook_command(SCRIPT_COMMAND, SCRIPT_DESC, "",
 """Usage:
 If you want to correct yourself, you often do this using the
