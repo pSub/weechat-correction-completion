@@ -99,11 +99,7 @@ def complete_typo(pos, input, buffer):
       except StopIteration:
         pass
 
-    # Put the replacement into the input
-    n = len(substr)
-    input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
-    w.buffer_set(buffer, 'input', input)
-    w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
+    changeInput(substr, replace, input, pos, buffer)
 
 def complete_replacement(pos, input, buffer):
     global curTypo, curRepl, suggestions
@@ -126,13 +122,14 @@ def complete_replacement(pos, input, buffer):
     
     # Take next suggestion
     curRepl += 1
+    changeInput(repl, suggestions[curRepl], input, pos, buffer)
 
+def changeInput(search, replace, input, pos, buffer):
     # Put the replacement into the input
-    n = len(repl)
-    input = '%s%s%s' %(input[:pos-n], suggestions[curRepl], input[pos:])
+    n = len(search)
+    input = '%s%s%s' %(input[:pos-n], replace, input[pos:])
     w.buffer_set(buffer, 'input', input)
-    w.buffer_set(buffer, 'input_pos', str(pos - n + len(suggestions[curRepl])))
-
+    w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
 
 def stripcolor(string):
     return w.string_remove_color(string, '')
