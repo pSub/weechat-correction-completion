@@ -20,8 +20,11 @@
 # http://0x80.pl/proj/aspell-python/
 ########################################################################
 
-import ctypes
-import ctypes.util
+try:
+    import ctypes
+    import ctypes.util
+except ImportError:
+    print "This script depends on ctypes"
 
 try:
     import weechat as w
@@ -38,6 +41,8 @@ SCRIPT_DESC    = "Provides a completion for 's/typo/correct'"
 SCRIPT_COMMAND = "correction_completion"
 
 # Default Options
+# Your can use all aspell options listed on
+# http://aspell.net/man-html/The-Options.html
 settings = {
         'lang' : 'en',
 }
@@ -52,6 +57,7 @@ def completion(data, completion_item, buffer, completion):
     fst = input.find("s/")
     snd = input.find("/", fst + 2)
 
+    # Check for typo or suggestion completion
     if pos > 2 and fst >= 0 and fst < pos:
         if snd >= 0 and snd < pos:
           complete_replacement(pos, input, buffer)
@@ -122,6 +128,8 @@ def complete_replacement(pos, input, buffer):
     
     # Take next suggestion
     curRepl += 1
+
+    # Put suggestion into the input
     changeInput(repl, suggestions[curRepl], input, pos, buffer)
 
 def changeInput(search, replace, input, pos, buffer):
@@ -135,6 +143,7 @@ def stripcolor(string):
     return w.string_remove_color(string, '')
 
 def search(p, i):
+    # Search for item matching the predicate p
     while True:
       try:
         item = next(i)
@@ -144,6 +153,7 @@ def search(p, i):
         return ""
 
 def unify(list):
+    # Remove duplicate elements from a list
     checked = []
     for e in list:
       if e not in checked:
@@ -201,12 +211,19 @@ if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT
     aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
     speller = 0
     
+    # Load configuration
     load_config()
 
     template = 'correction_completion'
+    
+    # Register completion hook
     w.hook_completion(template, "Completes after 's/' with words from buffer",
             'completion', '')
+
+    # Register hook to update config when option is changed with /set
     w.hook_config("plugins.var.python." + SCRIPT_NAME + ".*", "load_config", "")
+
+    # Register help command
     w.hook_command(SCRIPT_COMMAND, SCRIPT_DESC, "",
 """Usage:
 If you want to correct yourself, you often do this using the
@@ -214,6 +231,15 @@ expression 's/typo/correct'. This plugin allows you to complete the
 first part (the typo) by pressing <Tab>. The words from the actual
 buffer are used to complet this part. If the word can be perfectly
 matched the next word in alphabetical order is shown.
+
+The second part (the correction) can also be completed. Just press
+<Tab> and the best correction for the typo is fetched from aspell.
+If you press <Tab> again, it shows the next suggestion. The lanuage
+used for suggestions can be set over
+
+  plugins.var.python.correction_completion.lang
+
+The aspell language pack must be installed for this language.
 
 Setup:
 Add the template %%(%(completion)s) to the default completion template"""
