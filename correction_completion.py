@@ -47,7 +47,17 @@ settings = {
         'lang' : 'en',
 }
 
+#http://code.activestate.com/recipes/52308/
+class Bunch:
+    def __init__(self, **kwds):
+        self.__dict__.update(kwds)
+
 def completion(data, completion_item, buffer, completion):
+    if state.used == True:
+        return w.WEECHAT_RC_OK
+    else:
+        state.used = True
+
     # Current cursor position
     pos = w.buffer_get_integer(buffer, 'input_pos')
 
@@ -63,12 +73,13 @@ def completion(data, completion_item, buffer, completion):
           complete_replacement(pos, input, buffer)
         else:
           complete_typo(pos, input, buffer)
-    return WEECHAT_RC_OK
+
+    state.used = False
+    return w.WEECHAT_RC_OK
 
 def complete_typo(pos, input, buffer):
     # Assume that typo changes when doing a completion
-    global curRepl
-    curRepl = -1
+    state.curRepl = -1
 
     # Get the text of the current buffer
     list = []
@@ -108,8 +119,6 @@ def complete_typo(pos, input, buffer):
     changeInput(substr, replace, input, pos, buffer)
 
 def complete_replacement(pos, input, buffer):
-    global curTypo, curRepl, suggestions
-
     # Start Positions
     n = input.rfind("s/", 0, pos)
     m = input.rfind("/", n + 2, pos)
@@ -118,19 +127,22 @@ def complete_replacement(pos, input, buffer):
     typo = input[n + 2 : m]
     
     # Only query new suggestions, when typo changed
-    if curRepl == -1 or typo != curTypo:
-      suggestions = suggest(typo)
-      curTypo = typo
+    if state.curRepl == -1 or typo != state.curTypo:
+      state.suggestions = suggest(typo)
+      state.curTypo = typo
+
+    if len(state.suggestions) == 0:
+      return
 
     # Start at begining when reached end of suggestions
-    if curRepl == len(suggestions) - 1:
-      curRepl = -1
+    if state.curRepl == len(state.suggestions) - 1:
+      state.curRepl = -1
     
     # Take next suggestion
-    curRepl += 1
-
+    state.curRepl += 1
+    
     # Put suggestion into the input
-    changeInput(repl, suggestions[curRepl], input, pos, buffer)
+    changeInput(repl, state.suggestions[state.curRepl], input, pos, buffer)
 
 def changeInput(search, replace, input, pos, buffer):
     # Put the replacement into the input
@@ -205,9 +217,9 @@ def load_config(data = "", option = "", value = ""):
     return w.WEECHAT_RC_OK
 
 if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT_DESC, "", ""):
-    curTypo = ''
-    curRepl = -1
-    suggestions = []
+    # Saving the current completion state
+    state = Bunch(used = False, curTypo = '', curRepl = -1, suggestions = [])
+
     aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
     speller = 0
     
