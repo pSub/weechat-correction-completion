@@ -114,7 +114,7 @@ def complete_typo(pos, input, buffer):
       try:
         replace = next(i)
       except StopIteration:
-        pass
+        replace = substr
 
     changeInput(substr, replace, input, pos, buffer)
 
