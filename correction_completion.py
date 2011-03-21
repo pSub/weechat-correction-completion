@@ -47,7 +47,8 @@ settings = {
         'lang' : 'en',
 }
 
-#http://code.activestate.com/recipes/52308/
+# The Bunch Class is from
+# http://code.activestate.com/recipes/52308/
 class Bunch:
     def __init__(self, **kwds):
         self.__dict__.update(kwds)
@@ -220,6 +221,7 @@ if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT
     # Saving the current completion state
     state = Bunch(used = False, curTypo = '', curRepl = -1, suggestions = [])
 
+    # Use ctypes to access the apsell library
     aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
     speller = 0
     
