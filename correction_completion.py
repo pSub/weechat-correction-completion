@@ -28,7 +28,6 @@ except ImportError:
 
 try:
     import weechat as w
-    WEECHAT_RC_OK = w.WEECHAT_RC_OK
 except ImportError:
     print "This script must be run under WeeChat."
     print "Get WeeChat now at: http://www.weechat.org/"
