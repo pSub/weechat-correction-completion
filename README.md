@@ -26,4 +26,4 @@ standard /set-command e.g.
 
       /set weechat.completion.default_template "%(nicks)|%(irc_channels)|%(correction_completion)"
 
-      [1]:  http://weechat.org/scripts/source/stable/iset.pl/       "iset-plugin"
+  [1]:  http://weechat.org/scripts/source/stable/iset.pl/       "iset-plugin"
