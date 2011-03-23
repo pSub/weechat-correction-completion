@@ -14,9 +14,16 @@ The second part (the correction) can also be completed. Just press
 If you press <Tab> again, it shows the next suggestion. The lanuage
 used for suggestions can be set over
 
-  plugins.var.python.correction_completion.lang
+      plugins.var.python.correction_completion.lang
 
 The aspell language pack must be installed for this language.
 
 ### Setup:
-Add the template %(correction_completion) to the default completion template
+Add the template %(correction_completion) to the default completion template.
+The best way to set the template is to use the [iset-plugin] [1], because you see
+there the current value before while edit. Of course you can you also the
+standard /set-command e.g.
+
+      /set weechat.completion.default_template "%(nicks)|%(irc_channels)|%(correction_completion)"
+
+      [1]:  http://weechat.org/scripts/source/stable/iset.pl/       "iset-plugin"
