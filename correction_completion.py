@@ -20,6 +20,14 @@
 # http://0x80.pl/proj/aspell-python/
 ########################################################################
 
+# INSTALLTION
+# After copying this file into your python plugin directory, start weechat
+# load the script and follow futher instructions calling
+#    /help correction_completion
+# You can find these instructions as markdown on 
+#    https://github.com/pSub/weechat-correction-completion/blob/master/README.md
+# too.
+
 try:
     import ctypes
     import ctypes.util
