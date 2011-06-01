@@ -91,9 +91,10 @@ def complete_typo(pos, input, buffer):
 
     # Get the text of the current buffer
     list = []
-    infolist = w.infolist_get('buffer_lines', buffer, '');
+    infolist = w.infolist_get('buffer_lines', buffer, '')
     while w.infolist_next(infolist):
         list.append(stripcolor(w.infolist_string(infolist, 'message')))
+    w.infolist_free(infolist)
 
     # Generate a list of words
     text = (' '.join(list)).split(' ')
