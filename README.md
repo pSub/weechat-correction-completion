@@ -11,7 +11,7 @@ matched the next word in alphabetical order is shown.
 The second part (the correction) can also be completed. Just press
 *Tab* after the slash and the best correction for the typo is fetched from aspell.
 If you press *Tab* again, it shows the next suggestion.
-The lanuage used for suggestions can be set with the option
+The language used for suggestions can be set with the option
 
       plugins.var.python.correction_completion.lang
 
