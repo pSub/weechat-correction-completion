@@ -24,7 +24,7 @@
 # After copying this file into your python plugin directory, start weechat
 # load the script and follow futher instructions calling
 #    /help correction_completion
-# You can find these instructions as markdown on 
+# You can find these instructions as markdown on
 #    https://github.com/pSub/weechat-correction-completion/blob/master/README.md
 # too.
 
@@ -71,7 +71,7 @@ def completion(data, completion_item, buffer, completion):
 
     # Current input string
     input = w.buffer_get_string(buffer, 'input')
-    
+
     fst = input.find("s/")
     snd = input.find("/", fst + 2)
 
@@ -104,20 +104,20 @@ def complete_typo(pos, input, buffer):
 
     # Sort by alphabet and length
     text.sort(key=lambda item: (item, -len(item)))
-    
+
     i = iter(text)
-    
+
     # Get index of last occurence of "s/" befor cursor position
     n = input.rfind("s/", 0, pos)
 
     # Get substring and search the replacement
     substr = input[n+2:pos]
     replace = search((lambda word : word.startswith(substr)), i)
-    
+
     # If no replacement found, display substring
     if replace == "":
       replace = substr
-    
+
     # If substring perfectly matched take next replacement
     if replace == substr:
       try:
@@ -131,10 +131,10 @@ def complete_replacement(pos, input, buffer):
     # Start Positions
     n = input.rfind("s/", 0, pos)
     m = input.rfind("/", n + 2, pos)
-    
+
     repl = input[m + 1 : pos]
     typo = input[n + 2 : m]
-    
+
     # Only query new suggestions, when typo changed
     if state.curRepl == -1 or typo != state.curTypo:
       state.suggestions = suggest(typo)
@@ -146,10 +146,10 @@ def complete_replacement(pos, input, buffer):
     # Start at begining when reached end of suggestions
     if state.curRepl == len(state.suggestions) - 1:
       state.curRepl = -1
-    
+
     # Take next suggestion
     state.curRepl += 1
-    
+
     # Put suggestion into the input
     changeInput(repl, state.suggestions[state.curRepl], input, pos, buffer)
 
@@ -211,8 +211,8 @@ def load_config(data = "", option = "", value = ""):
           w.config_set_plugin(option, default)
         value = w.config_get_plugin(option)
         if not aspell.aspell_config_replace(
-                        config, 
-                        option.encode(), 
+                        config,
+                        option.encode(),
                         value.encode()):
           raise Exception("Failed to replace config entry")
 
@@ -232,12 +232,12 @@ if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT
     # Use ctypes to access the apsell library
     aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
     speller = 0
-    
+
     # Load configuration
     load_config()
 
     template = 'correction_completion'
-    
+
     # Register completion hook
     w.hook_completion(template, "Completes after 's/' with words from buffer",
             'completion', '')
