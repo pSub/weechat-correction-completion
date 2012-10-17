@@ -103,7 +103,7 @@ def complete_typo(pos, input, buffer):
     text = unify(text)
 
     # Sort by alphabet and length
-    text.sort(key=lambda item: (item, -len(item)))
+    text.sort(key=lambda item: (item, len(item)))
 
     i = iter(text)
 
