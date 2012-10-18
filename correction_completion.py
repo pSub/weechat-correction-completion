@@ -28,6 +28,27 @@
 #    https://github.com/pSub/weechat-correction-completion/blob/master/README.md
 # too.
 
+# Changelog:
+#
+# 2012-10-18 -- Version 0.3.0
+#    - incorrect words have a higher priority (typo completion)
+#    - the following characters are removed from the typo: , . ; : ? ! ) ( \ / " ^
+#
+# 2011-06-01 -- Version 0.2.2
+#    - fixed a memory leak, thanks to FlashCode
+#    - documentation updates
+#
+# 2011-03-19 -- Version 0.2.1
+#    - fixed bug that resulted in a crash of weechat
+#
+# 2011-03-18 -- Version 0.2.0
+#    - fixed out of bounds bug
+#    - apply config changes without reloading
+#    - improved performance
+#
+# 2011-02-19 -- Version 0.1.0
+#    - frist working version
+
 import re
 
 try:
