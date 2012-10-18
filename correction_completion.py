@@ -28,6 +28,8 @@
 #    https://github.com/pSub/weechat-correction-completion/blob/master/README.md
 # too.
 
+import re
+
 try:
     import ctypes
     import ctypes.util
@@ -93,7 +95,7 @@ def complete_typo(pos, input, buffer):
     list = []
     infolist = w.infolist_get('buffer_lines', buffer, '')
     while w.infolist_next(infolist):
-        list.append(stripcolor(w.infolist_string(infolist, 'message')))
+        list.append(strip_symbols(w.infolist_string(infolist, 'message')))
     w.infolist_free(infolist)
 
     # Generate a list of words
@@ -168,8 +170,8 @@ def changeInput(search, replace, input, pos, buffer):
     w.buffer_set(buffer, 'input', input)
     w.buffer_set(buffer, 'input_pos', str(pos - n + len(replace)))
 
-def stripcolor(string):
-    return w.string_remove_color(string, '')
+def strip_symbols(string):
+    return re_remove_chars.sub('', w.string_remove_color(string, ''))
 
 def search(p, i):
     # Search for item matching the predicate p
@@ -249,6 +251,9 @@ if w.register(SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENSE, SCRIPT
     # Use ctypes to access the apsell library
     aspell = ctypes.CDLL(ctypes.util.find_library('aspell'))
     speller = 0
+
+    # Regex to remove unwanted characters
+    re_remove_chars = re.compile('[,.;:?!\)\(\\\/\"\^]')
 
     # Load configuration
     load_config()
