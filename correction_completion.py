@@ -102,8 +102,16 @@ def complete_typo(pos, input, buffer):
     # Remove duplicate elements
     text = unify(text)
 
+    # Split words in correct and incorrect ones
+    good = [word for word in text if spellcheck(word) == True]
+    bad  = [word for word in text if spellcheck(word) == False]
+
     # Sort by alphabet and length
-    text.sort(key=lambda item: (item, len(item)))
+    good.sort(key=lambda item: (item, len(item)))
+    bad.sort(key=lambda item: (item, len(item)))
+
+    # Place incorrcet ones in front of correct ones
+    text = bad + good
 
     i = iter(text)
 
@@ -201,6 +209,15 @@ def suggest(word):
       return list
     else:
       raise TypeError("String expected")
+
+def spellcheck(word):
+    if type(word) is str:
+        return aspell.aspell_speller_check(
+            speller,
+            word,
+            len(word))
+    else:
+        raise TypeError("String expected")
 
 def load_config(data = "", option = "", value = ""):
     global speller
