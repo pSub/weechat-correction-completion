@@ -19,10 +19,8 @@ The aspell language pack must be installed for this language.
 
 ### Setup:
 Add the template %(correction_completion) to the default completion template.
-The best way to set the template is to use the [iset-plugin] [1], because you can see
-there the current value before changing it. Of course you can also use the
+The best way to set the template is to use the [iset-plugin](http://weechat.org/scripts/source/stable/iset.pl/),
+because you can see there the current value before changing it. Of course you can also use the
 standard /set-command e.g.
 
       /set weechat.completion.default_template "%(nicks)|%(irc_channels)|%(correction_completion)"
-
-  [1]:  http://weechat.org/scripts/source/stable/iset.pl/       "iset-plugin"
